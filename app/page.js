@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Box, Stack, Typography, Button, Modal, TextField } from '@mui/material'
+import React, { useState, useEffect } from 'react'
+import { Box, Stack, Typography, Button, Modal, TextField, Alert, Snackbar, IconButton } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close';
 import { firestore } from '@/firebase'
 import {
   collection,
@@ -31,9 +32,13 @@ const style = {
 export default function Home() {
   const [inventory, setInventory] = useState([])
   const [open, setOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState({open: false, name:"", quantity: ""});
+  const [snackbar, setSnackbar] = useState(false)
   const [itemName, setItemName] = useState('')
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+  const handleEditOpen = (name, quantity) => setEditOpen({open: true, name:name, quantity: quantity})
+  const handleEditClose = () => setEditOpen({open: false, name:"", quantity: ""})
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -74,6 +79,39 @@ export default function Home() {
     }
     await updateInventory()
   }
+
+  const editItem = async (item, newQuantity) => {
+    const docRef = doc(collection(firestore, 'inventory'), item)
+    const docSnap = await getDoc(docRef)
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data()
+      await setDoc(docRef, { quantity: newQuantity })
+
+    }
+    await updateInventory()
+  }
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbar(false);
+  };
+  
+  // For snackbar
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleCloseSnackbar}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <Box
@@ -117,6 +155,60 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
+      {/* Edit Item  */}
+      <Modal
+        open={editOpen.open}
+        onClose={handleEditClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Edit Item
+          </Typography>
+          <Stack width="100%" direction={'row'} spacing={2}>
+            {/* <TextField
+              id="outlined-basic"
+              label="Item"
+              variant="outlined"
+              fullWidth
+              value={editOpen.name}
+              onChange={(e) => handleEditOpen(e.target.value, editOpen.quantity)}
+            /> */}
+            <TextField
+              id="outlined-basic"
+              label="Quantity"
+              variant="outlined"
+              fullWidth
+              value={editOpen.quantity}
+              onChange={(e) => handleEditOpen(editOpen.name, e.target.value)}
+            />
+            <Button
+              variant="outlined"
+              onClick={() => {
+                let quantity = parseInt(editOpen.quantity);
+                if (!isNaN(quantity) && quantity > 0) {
+                  editItem(editOpen.name, quantity);
+                  handleEditClose();
+                } else if (isNaN(quantity)) {
+                  setSnackbar(true);
+                }
+              }}
+            >
+              Edit
+            </Button>
+          </Stack>
+        </Box>
+      </Modal>
+
+      <Snackbar
+        open={snackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message="Enter a valid number"
+        action={action}
+      />
+
       <Button variant="contained" onClick={handleOpen}>
         Add New Item
       </Button>
@@ -153,6 +245,10 @@ export default function Home() {
               </Typography>
               <Button variant="contained" onClick={() => removeItem(name)}>
                 Remove
+              </Button>
+              
+              <Button variant="contained" onClick={() => handleEditOpen(name, quantity)}>
+                Edit
               </Button>
             </Box>
           ))}

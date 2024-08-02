@@ -13,6 +13,7 @@ import {
   deleteDoc,
   getDoc,
 } from 'firebase/firestore'
+import { useRouter } from 'next/navigation';
 
 const style = {
   position: 'absolute',
@@ -114,6 +115,8 @@ export default function Home() {
     </React.Fragment>
   );
 
+  const router = useRouter();
+
   return (
     <Box
       width="100vw"
@@ -124,6 +127,9 @@ export default function Home() {
       alignItems={'center'}
       gap={2}
     >
+      <Button variant='outlines' onClick={
+        router.push("/camera")
+      }>Take Pic</Button>
       <Modal
         open={open}
         onClose={handleClose}

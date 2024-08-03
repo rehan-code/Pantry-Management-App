@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, createContext } from 'react'
 import { Box, Stack, Typography, Button, Modal, TextField, Alert, Snackbar, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import { firestore } from '@/firebase'
@@ -41,6 +41,8 @@ export default function Home() {
   const handleClose = () => setOpen(false)
   const handleEditOpen = (name, quantity) => setEditOpen({open: true, name:name, quantity: quantity})
   const handleEditClose = () => setEditOpen({open: false, name:"", quantity: ""})
+  const [picture, setPicture] = usePictureContext();
+
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -63,7 +65,7 @@ export default function Home() {
       const { quantity } = docSnap.data()
       await setDoc(docRef, { quantity: quantity + 1 })
     } else {
-      await setDoc(docRef, { quantity: 1 })
+      await setDoc(docRef, { quantity: 1 , image:picture})
     }
     await updateInventory()
   }

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Camera } from 'react-camera-pro';
 import styled from 'styled-components';
+import { usePictureContext } from '../pictureContext';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -150,6 +151,7 @@ const App = () => {
   const [devices, setDevices] = useState([]);
   const [activeDeviceId, setActiveDeviceId] = useState(undefined);
   const [torchToggled, setTorchToggled] = useState(false);
+  const [picture, setPicture] = usePictureContext();
 
   useEffect(() => {
     (async () => {
@@ -211,6 +213,7 @@ const App = () => {
               const photo = camera.current.takePhoto();
               console.log(photo);
               setImage(photo);
+              setPicture(photo);
             }
           }}
         />

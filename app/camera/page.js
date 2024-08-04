@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera } from 'react-camera-pro';
 import styled from 'styled-components';
 import { usePictureContext } from '../pictureContext';
+import { useRouter } from 'next/navigation';
+import { query } from 'firebase/firestore';
 
 const Wrapper = styled.div`
   position: fixed;
@@ -117,7 +119,7 @@ const ChangeFacingCameraButton = styled(Button)`
   }
 `;
 
-const ImagePreview = styled.div`
+export const ImagePreview = styled.div`
   width: 120px;
   height: 120px;
   ${({ image }) => (image ? `background-image:  url(${image});` : "")}
@@ -151,7 +153,9 @@ const App = () => {
   const [devices, setDevices] = useState([]);
   const [activeDeviceId, setActiveDeviceId] = useState(undefined);
   const [torchToggled, setTorchToggled] = useState(false);
-  const [picture, setPicture] = usePictureContext();
+  const {picture, setPicture} = usePictureContext();
+  const router = useRouter();
+
 
   useEffect(() => {
     (async () => {
@@ -214,6 +218,7 @@ const App = () => {
               console.log(photo);
               setImage(photo);
               setPicture(photo);
+              router.push("/?picture=true")
             }
           }}
         />

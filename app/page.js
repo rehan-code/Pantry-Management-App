@@ -14,6 +14,8 @@ import {
   getDoc,
 } from 'firebase/firestore'
 import { useRouter } from 'next/navigation';
+import { usePictureContext } from './pictureContext';
+import {ImagePreview} from './camera/page.js';
 
 const style = {
   position: 'absolute',
@@ -31,9 +33,9 @@ const style = {
   gap: 3,
 }
 
-export default function Home() {
+export default function Home({params, searchParams}) {
   const [inventory, setInventory] = useState([])
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(searchParams.picture == 'true' ? true : false)
   const [editOpen, setEditOpen] = useState({open: false, name:"", quantity: ""});
   const [snackbar, setSnackbar] = useState(false)
   const [itemName, setItemName] = useState('')
@@ -41,7 +43,7 @@ export default function Home() {
   const handleClose = () => setOpen(false)
   const handleEditOpen = (name, quantity) => setEditOpen({open: true, name:name, quantity: quantity})
   const handleEditClose = () => setEditOpen({open: false, name:"", quantity: ""})
-  const [picture, setPicture] = usePictureContext();
+  const {picture, setPicture} = usePictureContext();
 
 
   const updateInventory = async () => {
@@ -65,7 +67,8 @@ export default function Home() {
       const { quantity } = docSnap.data()
       await setDoc(docRef, { quantity: quantity + 1 })
     } else {
-      await setDoc(docRef, { quantity: 1 , image:picture})
+      await setDoc(docRef, { quantity: 1, picture: picture})
+      setPicture(null);
     }
     await updateInventory()
   }
@@ -129,9 +132,6 @@ export default function Home() {
       alignItems={'center'}
       gap={2}
     >
-      <Button variant='outlines' onClick={
-        router.push("/camera")
-      }>Take Pic</Button>
       <Modal
         open={open}
         onClose={handleClose}
@@ -143,14 +143,31 @@ export default function Home() {
             Add Item
           </Typography>
           <Stack width="100%" direction={'row'} spacing={2}>
-            <TextField
-              id="outlined-basic"
-              label="Item"
-              variant="outlined"
-              fullWidth
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
+            <Stack width="100%" direction={'column'} spacing={2}>
+              <TextField
+                id="outlined-basic"
+                label="Item"
+                variant="outlined"
+                fullWidth
+                value={itemName}
+                onChange={(e) => setItemName(e.target.value)}
+              />
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  router.push("/camera")
+                }}
+              >
+                Add Image
+              </Button>
+              <ImagePreview
+                image={picture}
+                onClick={() => {
+                  // setShowImage(!showImage);
+                }}
+              />
+            </Stack>
+            
             <Button
               variant="outlined"
               onClick={() => {

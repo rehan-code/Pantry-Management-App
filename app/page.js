@@ -142,7 +142,6 @@ export default function Home({params, searchParams}) {
       return 0;
     }) : inventory
 
-    console.log(inv)
     if (!query) {
       return inv;
     } else {
@@ -193,9 +192,6 @@ export default function Home({params, searchParams}) {
               </Button>
               <ImagePreview
                 image={picture}
-                onClick={() => {
-                  // setShowImage(!showImage);
-                }}
               />
             </Stack>
             
@@ -288,7 +284,7 @@ export default function Home({params, searchParams}) {
           <Button variant={sort ? 'contained' : 'outlined'} onClick={toggleSort}><SortByAlphaOutlined/></Button>
         </Box>
         <Stack width="1000px" height="600px" spacing={2} overflow={'auto'} sx={{borderBottomLeftRadius:10, borderBottomRightRadius:10}}>
-          {dataFiltered.map(({name, quantity}) => (
+          {dataFiltered.map(({name, quantity, picture}) => (
             <Box
               key={name}
               width="100%"
@@ -299,6 +295,9 @@ export default function Home({params, searchParams}) {
               bgcolor={'#f0f0f0'}
               paddingX={5}
             >
+              <ImagePreview
+                image={picture}
+              />
               <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Typography>

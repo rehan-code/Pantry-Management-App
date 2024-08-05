@@ -7,7 +7,7 @@ const SearchBar = ({setSearchQuery}) => (
       id="search-bar"
       className="text"
       onInput={(e) => {
-      setSearchQuery(e.target.value);
+         setSearchQuery(e.target.value);
       }}
       label="Search"
       variant="outlined"

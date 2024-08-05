@@ -267,7 +267,7 @@ export default function Home({params, searchParams}) {
       </Button>
       <Box border= '6px solid lightblue' borderRadius={4}>
         <Box
-          width="1000px"
+          width="70vw"
           height="100px"
           bgcolor={'#ADD8E6'}
           display={'flex'}
@@ -279,11 +279,11 @@ export default function Home({params, searchParams}) {
             Inventory Items
           </Typography>
         </Box>
-        <Box width="1000px" height="80px" display={'flex'} justifyContent={'space-evenly'} alignItems={'center'}>
+        <Box width="70vw" height="80px" display={'flex'} justifyContent={'space-evenly'} alignItems={'center'}>
           <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          <Button variant={sort ? 'contained' : 'outlined'} onClick={toggleSort}><SortByAlphaOutlined/></Button>
+          {/* <Button variant={sort ? 'contained' : 'outlined'} onClick={toggleSort}><SortByAlphaOutlined/></Button> */}
         </Box>
-        <Stack width="1000px" height="600px" spacing={2} overflow={'auto'} sx={{borderBottomLeftRadius:10, borderBottomRightRadius:10}}>
+        <Stack width="70vw" height="600px" spacing={2} overflow={'auto'} sx={{borderBottomLeftRadius:10, borderBottomRightRadius:10}}>
           {dataFiltered.map(({name, quantity, picture}) => (
             <Box
               key={name}

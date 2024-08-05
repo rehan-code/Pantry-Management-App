@@ -16,6 +16,8 @@ import {
 import { useRouter } from 'next/navigation';
 import { usePictureContext } from './pictureContext';
 import {ImagePreview} from './camera/page.js';
+import SearchBar from './components/searchBar';
+import { SortByAlphaOutlined } from '@mui/icons-material';
 
 const style = {
   position: 'absolute',
@@ -38,12 +40,16 @@ export default function Home({params, searchParams}) {
   const [open, setOpen] = useState(searchParams.picture == 'true' ? true : false)
   const [editOpen, setEditOpen] = useState({open: false, name:"", quantity: ""});
   const [snackbar, setSnackbar] = useState(false)
+  const [sort, setSort] = useState(false)
   const [itemName, setItemName] = useState('')
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+  const toggleSort = () => {sort ? setSort(false) : setSort(true)}
   const handleEditOpen = (name, quantity) => setEditOpen({open: true, name:name, quantity: quantity})
   const handleEditClose = () => setEditOpen({open: false, name:"", quantity: ""})
   const {picture, setPicture} = usePictureContext();
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
 
 
   const updateInventory = async () => {
@@ -67,7 +73,7 @@ export default function Home({params, searchParams}) {
       const { quantity } = docSnap.data()
       await setDoc(docRef, { quantity: quantity + 1 })
     } else {
-      await setDoc(docRef, { quantity: 1, picture: picture})
+      await setDoc(docRef, { quantity: 1, picture: picture == undefined ? null : picture})
       setPicture(null);
     }
     await updateInventory()
@@ -120,7 +126,32 @@ export default function Home({params, searchParams}) {
     </React.Fragment>
   );
 
-  const router = useRouter();
+  const filterData = (query) => {
+    let inv = inventory
+    sort ? inv.sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+    
+      // names must be equal
+      return 0;
+    }) : inventory
+
+    console.log(inv)
+    if (!query) {
+      return inv;
+    } else {
+      return inv.filter(({name}) => name.toLowerCase().includes(query));
+    }
+  };
+
+  const dataFiltered = filterData(searchQuery);
+
 
   return (
     <Box
@@ -238,21 +269,26 @@ export default function Home({params, searchParams}) {
       <Button variant="contained" onClick={handleOpen}>
         Add New Item
       </Button>
-      <Box border={'1px solid #333'}>
+      <Box border= '6px solid lightblue' borderRadius={4}>
         <Box
-          width="800px"
+          width="1000px"
           height="100px"
           bgcolor={'#ADD8E6'}
           display={'flex'}
           justifyContent={'center'}
           alignItems={'center'}
+          sx={{borderTopLeftRadius:10, borderTopRightRadius:10}}
         >
-          <Typography variant={'h2'} color={'#333'} textAlign={'center'}>
+          <Typography variant={'h2'} color={'#333'} textAlign={'center'} >
             Inventory Items
           </Typography>
         </Box>
-        <Stack width="800px" height="300px" spacing={2} overflow={'auto'}>
-          {inventory.map(({name, quantity}) => (
+        <Box width="1000px" height="80px" display={'flex'} justifyContent={'space-evenly'} alignItems={'center'}>
+          <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <Button variant={sort ? 'contained' : 'outlined'} onClick={toggleSort}><SortByAlphaOutlined/></Button>
+        </Box>
+        <Stack width="1000px" height="600px" spacing={2} overflow={'auto'} sx={{borderBottomLeftRadius:10, borderBottomRightRadius:10}}>
+          {dataFiltered.map(({name, quantity}) => (
             <Box
               key={name}
               width="100%"

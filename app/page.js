@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, createContext } from 'react'
-import { Box, Stack, Typography, Button, Modal, TextField, Alert, Snackbar, IconButton } from '@mui/material'
+import { Box, Stack, Typography, Button, Modal, TextField, Alert, Snackbar, IconButton, ThemeProvider } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close';
 import { firestore } from '@/firebase'
 import {
@@ -18,6 +18,7 @@ import { usePictureContext } from './pictureContext';
 import {ImagePreview} from './camera/page.js';
 import SearchBar from './components/searchBar';
 import { SortByAlphaOutlined } from '@mui/icons-material';
+import { theme } from './theme';
 
 const style = {
   position: 'absolute',
@@ -151,8 +152,8 @@ export default function Home({params, searchParams}) {
 
   const dataFiltered = filterData(searchQuery);
 
-
   return (
+    <ThemeProvider theme={theme}>
     <Box
       width="100vw"
       height="100vh"
@@ -297,24 +298,30 @@ export default function Home({params, searchParams}) {
             >
               <ImagePreview
                 image={picture}
+                marginX={4}
               />
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
+              <Typography variant={'h3'} fontWeight={'bold'} marginX={4} color={'#333'} textAlign={'center'}>
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </Typography>
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
+              <Typography variant={'h3'} color={'#333'} marginX={4} textAlign={'center'}>
                 Quantity: {quantity}
               </Typography>
-              <Button variant="contained" onClick={() => removeItem(name)}>
-                Remove
-              </Button>
-              
-              <Button variant="contained" onClick={() => handleEditOpen(name, quantity)}>
-                Edit
-              </Button>
+
+              <Stack direction={'column'} marginX={4} spacing={2}>
+                <Button variant="contained" onClick={() => removeItem(name)}>
+                  Remove
+                </Button>
+                
+                <Button variant="contained" onClick={() => handleEditOpen(name, quantity)}>
+                  Edit
+                </Button>
+              </Stack>
+
             </Box>
           ))}
         </Stack>
       </Box>
     </Box>
+    </ThemeProvider>
   )
 }

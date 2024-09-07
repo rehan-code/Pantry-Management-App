@@ -1,4 +1,4 @@
-# Pantry Tracker webapp
+# Pantry Tracker WebApp
 
 app that allows you to add inventory items including photos and keep track of them.
 AI search allows you to search for items intelligently as well from image recognition.
